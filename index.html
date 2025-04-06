@@ -1,0 +1,24 @@
+<script>
+	window.onload = function() {
+		time();
+	}
+	
+	function time() {
+		var today = new Date();   
+
+		var hours = ('0' + today.getHours()).slice(-2); 
+		var minutes = ('0' + today.getMinutes()).slice(-2);
+		//var seconds = ('0' + today.getSeconds()).slice(-2); 
+		//var timeString = hours + ':' + minutes  + ':' + seconds;
+		var timeString = hours + ':' + minutes;	
+			
+		document.getElementById('time').innerHTML = timeString;	
+	}
+	//setInterval("time()", 1000);
+	setInterval("time()", 60000);
+</script>
+<body>
+	<span style="color:white;font-size:35px;font-weight:bold;font-family:hy¿ï¸ªµµb;text-shadow:-1px 0 black,0 1px black,1px 0 black,0 -1px black;">ÂÄÇÜ<font color="red">L</font>ive</span>
+	<span style="color:white;font-size:35px;font-weight:bold;font-family:hy¿ï¸ªµµb;text-shadow:-1px 0 black,0 1px black,1px 0 black,0 -1px black;visibility:hidden;">&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;ÀÚÀ²ÈÄ¿ø <font color="#FFFF66">Ä«Ä«¿À</font> 3333-07-6967896 <font color="#CCCCFF">¤·¤¸¤¾</font>&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;</span>
+	<span id="time" style="color:white;font-size:35px;font-weight:bold;font-family:hy¿ï¸ªµµb;text-shadow:-1px 0 black,0 1px black,1px 0 black,0 -1px black;"></span>
+</body>
