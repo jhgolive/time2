@@ -1,8 +1,78 @@
 <script>
 	window.onload = function() {
 		time();
+		typing();
 	}
 	
+	function typing() {
+		const $text = document.querySelector(".typing .text");
+		
+		// 글자 모음
+		const letters = [
+			"쩡햄Live",
+			"자율적후원",
+			//"1♡버듸꼰듀",
+			//"2♡귀요밍",
+			//"2♡하리라",
+			//"3순종아줌마",
+			//"1♡금꽃곰",
+			//"2♡오상희",
+			//"3♡개밥그릇",
+			//"3♡겸손정빈",
+			//"3♡8월의",
+			//"5♡트로이",
+			"구독좋아요",
+			"감사합니다"
+		];
+		
+		// 글자 입력 속도
+		const speed = 100;
+		let i = 0;
+		
+		// 타이핑 효과
+		const typing = async () => {  
+			const letter = letters[i].split("");
+		  
+			while (letter.length) {
+				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('L',`<span style="color: red;">${"L"}</span>`);
+		    		await wait(speed);
+		    		$text.innerHTML += letter.shift(); 
+			}
+		  
+			// 잠시 대기
+			await wait(15000);
+		  
+			// 지우는 효과
+			remove();
+		}
+		
+		// 글자 지우는 효과
+		const remove = async () => {
+			const letter = letters[i].split("");
+		  
+			while (letter.length) {
+				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('L',`<span style="color: red;">${"L"}</span>`);
+		    		await wait(speed);
+		    
+		    		letter.pop();
+		    		$text.innerHTML = letter.join(""); 
+			}
+		  
+		  	// 다음 순서의 글자로 지정, 타이핑 함수 다시 실행
+		  	i = !letters[i+1] ? 0 : i + 1;
+		  	typing();
+		}
+		
+		// 딜레이 기능 ( 마이크로초 )
+		function wait(ms) {
+			return new Promise(res => setTimeout(res, ms))
+		}
+		
+		// 초기 실행
+		setTimeout(typing, 1000);
+	}
+
+	// 시계
 	function time() {
 		var today = new Date();   
 
@@ -18,7 +88,15 @@
 	setInterval("time()", 60000);
 </script>
 <body>
-	<span style="color:white;font-size:45px;font-weight:bold;font-family:hy울릉도b;text-shadow:-1px 0 black,0 1px black,1px 0 black,0 -1px black;visibility:hidden;">쩡햄<font color="red">L</font>ive</span>
-	<span style="color:white;font-size:45px;font-weight:bold;font-family:hy울릉도b;text-shadow:-1px 0 black,0 1px black,1px 0 black,0 -1px black;">&ensp;&ensp;&ensp;&ensp;<font color="#FFD700">카카오</font> 3333-07-6967896 <font color="#4682B4">오☆한</font>&ensp;&ensp;&ensp;&ensp;</span>
-	<span id="time" style="color:white;font-size:45px;font-weight:bold;font-family:hy울릉도b;text-shadow:-1px 0 black,0 1px black,1px 0 black,0 -1px black;"></span>
+	<table>
+		<tr>
+			<td width="275">
+				<span class="typing" style="color:white;font-size:45px;font-weight:bold;font-family:hy울릉도b;text-shadow:-1px 0 black,0 1px black,1px 0 black,0 -1px black;"><span id="textcolor" class="text"></span></span>
+			</td>
+			<td>
+				<span style="color:white;font-size:45px;font-weight:bold;font-family:hy울릉도b;text-shadow:-1px 0 black,0 1px black,1px 0 black,0 -1px black;visibility:hidden;"><font color="#FFD700">카카오</font> 33330-7696-7896 <font color="#4682B4">오☆한</font>&ensp;&ensp;&ensp;&ensp;</span>
+				<span id="time" style="color:white;font-size:45px;font-weight:bold;font-family:hy울릉도b;text-shadow:-1px 0 black,0 1px black,1px 0 black,0 -1px black;"></span>
+			</td>
+		</tr>
+	</table>
 </body>
