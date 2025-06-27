@@ -24,12 +24,16 @@
 		  
 			while (letter.length) {
 				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('L',`<span style="color: red;">${"L"}</span>`);
-		    		await wait(speed);
+				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('감',`<span style="color: red;">${"감"}</span>`);
+				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('사',`<span style="color: red;">${"사"}</span>`);
+				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('구',`<span style="color: red;">${"구"}</span>`);
+				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('독',`<span style="color: red;">${"독"}</span>`);
+				await wait(speed);
 		    		$text.innerHTML += letter.shift(); 
 			}
 		  
 			// 잠시 대기
-			await wait(15000);
+			await wait(14000);
 		  
 			// 지우는 효과
 			remove();
@@ -41,7 +45,11 @@
 		  
 			while (letter.length) {
 				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('L',`<span style="color: red;">${"L"}</span>`);
-		    		await wait(speed);
+				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('감',`<span style="color: red;">${"감"}</span>`);
+				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('사',`<span style="color: red;">${"사"}</span>`);
+				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('구',`<span style="color: red;">${"구"}</span>`);
+				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('독',`<span style="color: red;">${"독"}</span>`);
+				await wait(speed);
 		    
 		    		letter.pop();
 		    		$text.innerHTML = letter.join(""); 
