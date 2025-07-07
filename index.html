@@ -9,9 +9,11 @@
 		
 		// 글자 모음
 		const letters = [
-			"쩡햄Live",
-			"구독좋아요",
-			"감사합니다"
+			"쩡햄Live ",
+			//"자율적후원 ",
+			//"6 7 8 9 10 11 ",
+			"구독좋아요 ",
+			"감사합니다 "
 		];
 		
 		// 글자 입력 속도
@@ -24,10 +26,23 @@
 		  
 			while (letter.length) {
 				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('L',`<span style="color: red;">${"L"}</span>`);
+				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('후',`<span style="color: red;">${"후"}</span>`);
+				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('원',`<span style="color: red;">${"원"}</span>`);
 				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('감',`<span style="color: red;">${"감"}</span>`);
 				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('사',`<span style="color: red;">${"사"}</span>`);
 				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('구',`<span style="color: red;">${"구"}</span>`);
 				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('독',`<span style="color: red;">${"독"}</span>`);
+				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('1',`<span style="color: red;">${"1"}</span>`);
+				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('2',`<span style="color: red;">${"2"}</span>`);
+				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('3',`<span style="color: red;">${"3"}</span>`);
+				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('4',`<span style="color: red;">${"4"}</span>`);
+				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('5',`<span style="color: red;">${"5"}</span>`);
+				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('6',`<span style="color: red;">${"6"}</span>`);
+				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('7',`<span style="color: red;">${"7"}</span>`);
+				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('8',`<span style="color: red;">${"8"}</span>`);
+				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('9',`<span style="color: red;">${"9"}</span>`);
+				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('10',`<span style="color: red;">${"10"}</span>`);
+				
 				await wait(speed);
 		    		$text.innerHTML += letter.shift(); 
 			}
@@ -45,10 +60,23 @@
 		  
 			while (letter.length) {
 				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('L',`<span style="color: red;">${"L"}</span>`);
+				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('후',`<span style="color: red;">${"후"}</span>`);
+				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('원',`<span style="color: red;">${"원"}</span>`);
 				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('감',`<span style="color: red;">${"감"}</span>`);
 				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('사',`<span style="color: red;">${"사"}</span>`);
 				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('구',`<span style="color: red;">${"구"}</span>`);
 				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('독',`<span style="color: red;">${"독"}</span>`);
+				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('1',`<span style="color: red;">${"1"}</span>`);
+				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('2',`<span style="color: red;">${"2"}</span>`);
+				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('3',`<span style="color: red;">${"3"}</span>`);
+				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('4',`<span style="color: red;">${"4"}</span>`);
+				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('5',`<span style="color: red;">${"5"}</span>`);
+				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('6',`<span style="color: red;">${"6"}</span>`);
+				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('7',`<span style="color: red;">${"7"}</span>`);
+				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('8',`<span style="color: red;">${"8"}</span>`);
+				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('9',`<span style="color: red;">${"9"}</span>`);
+				document.getElementById("textcolor").innerHTML = document.getElementById("textcolor").innerHTML.replace('10',`<span style="color: red;">${"10"}</span>`);
+				
 				await wait(speed);
 		    
 		    		letter.pop();
@@ -87,11 +115,11 @@
 <body>
 	<table border="0">
 		<tr>
-			<td width="275" style="vertical-align:top;">
+			<td width="975" style="vertical-align:top;text-align:right;white-space:nowrap;overflow:hidden;max-width:975px;padding-left:0px;padding-right:85px;"><!--width max-width:테이블밀려남조정 padding-right:앞글자맞추기-->
 				<span class="typing" style="color:white;font-size:45px;font-weight:bold;font-family:hy울릉도b;text-shadow:-2px 0 black,0 2px black,2px 0 black,0 -2px black;"><span id="textcolor" class="text"></span></span>
+				<span style="color:white;font-size:45px;font-weight:bold;font-family:hy울릉도b;text-shadow:-2px 0 black,0 2px black,2px 0 black,0 -2px black;visibility:hidden;"><font color="#FFD700">&ensp;&ensp;&ensp;카카오</font> 33330-7696-7896 <font color="#6495ED">오J한</font></span>
 			</td>
-			<td style="vertical-align:top;">
-				<span style="color:white;font-size:45px;font-weight:bold;font-family:hy울릉도b;text-shadow:-2px 0 black,0 2px black,2px 0 black,0 -2px black;visibility:hidden;"><font color="#FFD700">카카오</font> 33330-7696-7896 <font color="#6495ED">오☆한</font>&ensp;&ensp;&ensp;&ensp;</span>
+			<td style="vertical-align:top;text-align:right;padding-top:12px;padding-left:50px;">
 				<span id="time" style="color:white;font-size:45px;font-weight:bold;font-family:hy울릉도b;text-shadow:-2px 0 black,0 2px black,2px 0 black,0 -2px black;"></span>
 			</td>
 		</tr>
