@@ -1,4 +1,6 @@
   <script>
+    let typingLoopActive = true;
+
     window.onload = function () {
       time();
       typing();
@@ -7,42 +9,65 @@
     function typing() {
       const $text = document.querySelector(".typing .text");
       const letters = [
-	"쩡햄Live ",
-	//"자율적후원 ",
-	//"자율적후원 1 2    3    4    5 ",
-	//"1 2    3    4    5    6 ",
-	//"6 7    8    9    10    11 ",
-	"구독좋아요 ",
-	"감사합니다 "
+			"쩡햄Live ",
+			//"자율적후원 ",
+			//"자율적후원 1 2    3    4    5 ",
+			//"1 2    3    4    5    6 ",
+			//"6 7    8    9    10    11 ",
+			"구독좋아요 ",
+			"감사합니다 ",
+			"다시윤석열 다시대한민국 다시위대하게 YOONAGAIN"
       ];
+
+      const wordList = [
+        { words: ["L", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "후원", "구독", "감사", "YOON", "다시"], color: "red" },
+        { words: ["AGAIN"], color: "#6495ED" }
+      ];
+
       const speed = 100;
       let i = 0;
 
       const typingFunc = async () => {
-        const letter = letters[i].split("");
+        if (!typingLoopActive) return;
+        $text.innerHTML = "";
+        const raw = letters[i];
+        const typingChars = [];
+        const consumed = Array(raw.length).fill(false);
 
-        while (letter.length) {
+        for (const group of wordList) {
+          for (const word of group.words) {
+            let startIndex = 0;
+            while (startIndex < raw.length) {
+              const index = raw.indexOf(word, startIndex);
+              if (index === -1) break;
+              for (let j = 0; j < word.length; j++) {
+                typingChars[index + j] = { char: word[j], color: group.color };
+                consumed[index + j] = true;
+              }
+              startIndex = index + 1;
+            }
+          }
+        }
+
+        for (let j = 0; j < raw.length; j++) {
+          if (!consumed[j]) {
+            typingChars[j] = { char: raw[j], color: "white" };
+          }
+        }
+
+        for (const { char, color } of typingChars) {
+          if (!typingLoopActive) return;
           await wait(speed);
-          const char = letter.shift();
-
           const span = document.createElement("span");
           span.textContent = char;
-
-          if (char.match(/(L|후|원|감|사|구|독|[1-9]|10)/)) {
-            span.style.color = "red";
-          } else {
-            span.style.color = "white";
-          }
-
+          span.style.color = color;
           $text.appendChild(span);
 
           const rect = span.getBoundingClientRect();
           const x = rect.left + rect.width / 2 + window.scrollX;
           const y = rect.top + rect.height / 2 + window.scrollY + 10;
 
-          for (let k = 0; k < 10; k++) {
-            createBrick(x, y, span.style.color);
-          }
+          createBricksBatch(x, y, color, 10);
         }
 
         await wait(14000);
@@ -50,21 +75,21 @@
       };
 
       const remove = async () => {
-        const spans = Array.from($text.childNodes);
+        const spans = Array.from($text.childNodes).reverse();
         while (spans.length) {
+          if (!typingLoopActive) return;
           await wait(speed);
-          const span = spans.pop();
+          const span = spans.shift();
           if (span && span.getBoundingClientRect) {
             const rect = span.getBoundingClientRect();
             const x = rect.left + rect.width / 2 + window.scrollX;
             const y = rect.top + rect.height / 2 + window.scrollY + 10;
 
-            for (let k = 0; k < 10; k++) {
-              createBrick(x, y, span.style.color);
-            }
+            createBricksBatch(x, y, span.style.color, 10);
           }
           if (span) span.remove();
         }
+
         i = (i + 1) % letters.length;
         typingFunc();
       };
@@ -73,66 +98,144 @@
         return new Promise((res) => setTimeout(res, ms));
       }
 
-      setTimeout(typingFunc, 1000);
+      if (window.requestIdleCallback) {
+        requestIdleCallback(typingFunc); // ✅ 변경된 부분
+      } else {
+        setTimeout(typingFunc, 1000); // fallback
+      }
     }
 
-    function createBrick(x, y, color = "white") {
-      const brick = document.createElement("div");
-      brick.className = "brick";
-      brick.style.left = x + "px";
-      brick.style.top = y + "px";
-      brick.style.background = color;
-      brick.style.border = "1px solid black";
-      brick.style.opacity = 1;
-      document.body.appendChild(brick);
+    (function () {
+      const brickPool = [];
+      const MAX_POOL = 100;
 
-      let dx = (Math.random() - 0.5) * 6;
-      let dy = (Math.random() - 1.5) * 6;
-      let gravity = 0.5;
-      let friction = 0.6;
-      let posX = x;
-      let posY = y;
-      const ground = y + 0; // 글자 바로 아래 쌓이도록 수정
+      function getBrick() {
+        if (brickPool.length > 0) {
+          return brickPool.pop();
+        }
+        const div = document.createElement("div");
+        div.className = "brick";
+        return div;
+      }
 
-      function fall() {
-        dy += gravity;
-        posX += dx;
-        posY += dy;
+      function recycleBrick(brick) {
+        brick.style.display = "none";
+        brick.style.opacity = 1;
+        brick.fading = false;
 
-        if (posY >= ground) {
-          posY = ground;
-          dy = 0;
-          dx *= friction;
-          if (Math.abs(dx) < 0.1) dx = 0;
-
-          if (!brick.fading) {
-            brick.fading = true;
-            setTimeout(() => {
-              let opacity = 1;
-              const fadeOut = () => {
-                opacity -= 1;  // 더 빠르게 감소
-                if (opacity <= 0) {
-                  brick.remove();
-                } else {
-                  brick.style.opacity = opacity;
-                  requestAnimationFrame(fadeOut);
-                }
-              };
-              fadeOut();
-            }, 200);	 // 지연시간도 절반 이하로 줄임
-          }
+        // 순환 참조 해제
+        if (brick.__data__) {
+          brick.__data__.element = null;
+          brick.__data__ = null;
         }
 
-        brick.style.left = posX + "px";
-        brick.style.top = posY + "px";
+        brickPool.push(brick);
 
-        if (posY < ground || Math.abs(dx) > 0.1) {
-          requestAnimationFrame(fall);
+        // 과잉 브릭 전부 제거
+        while (brickPool.length > MAX_POOL) {
+          const removed = brickPool.pop();
+          removed.remove();
         }
       }
 
-      fall();
-    }
+      const activeBricks = [];
+      let isAnimating = false;
+
+      function animateBricks() {
+        const gravity = 0.5;
+        const friction = 0.6;
+
+        for (let i = activeBricks.length - 1; i >= 0; i--) {
+          const b = activeBricks[i];
+          if (!b.falling) continue;
+
+          b.dy += gravity;
+          b.posX += b.dx;
+          b.posY += b.dy;
+
+          if (b.posY >= b.ground) {
+            b.posY = b.ground;
+            b.dy = 0;
+            b.dx *= friction;
+            if (Math.abs(b.dx) < 0.1) b.dx = 0;
+
+            if (!b.fading) {
+              b.fading = true;
+              b.fadeOpacity = 1;
+            }
+          }
+
+          b.element.style.left = b.posX + "px";
+          b.element.style.top = b.posY + "px";
+
+          if (b.fading) {
+            b.fadeOpacity -= 0.05;
+            if (b.fadeOpacity <= 0) {
+              b.fading = false;
+              b.falling = false;
+
+              recycleBrick(b.element);
+              activeBricks.splice(i, 1);
+              continue;
+            } else {
+              b.element.style.opacity = b.fadeOpacity;
+            }
+          }
+        }
+
+        if (activeBricks.length > 0) {
+          requestAnimationFrame(animateBricks);
+        } else {
+          isAnimating = false;
+        }
+      }
+
+      window.createBricksBatch = function (x, y, color = "white", count = 10) {
+        const fragment = document.createDocumentFragment();
+        const bricksToAnimate = [];
+
+        for (let i = 0; i < count; i++) {
+          const brick = getBrick();
+          brick.style.left = x + "px";
+          brick.style.top = y + "px";
+          brick.style.background = color;
+          brick.style.border = "1px solid black";
+          brick.style.opacity = 1;
+          brick.style.display = "block";
+
+          fragment.appendChild(brick);
+
+          const dx = (Math.random() - 0.5) * 6;
+          const dy = (Math.random() - 1.5) * 6;
+
+          const brickData = {
+            element: brick,
+            posX: x,
+            posY: y,
+            dx: dx,
+            dy: dy,
+            ground: y,
+            fading: false,
+            fadeOpacity: 1,
+            falling: true,
+          };
+
+          // 순환 참조 해제를 위해 brick에 데이터 직접 연결
+          brick.__data__ = brickData;
+
+          bricksToAnimate.push(brickData);
+        }
+
+        document.body.appendChild(fragment);
+
+        activeBricks.push(...bricksToAnimate);
+
+        if (!isAnimating) {
+          isAnimating = true;
+          requestAnimationFrame(animateBricks);
+        }
+      };
+    })();
 
     function time() {
       const today = new Date();
@@ -141,7 +244,14 @@
       document.getElementById("time").innerHTML = hours + ":" + minutes;
     }
 
-    setInterval(time, 60000);
+    const timeInterval = setInterval(time, 60000);
+
+    // ✅ 메모리 릭 방지
+    window.addEventListener("unload", function () {
+      clearInterval(timeInterval);
+      typingLoopActive = false;
+      window.createBricksBatch = () => {};
+    });
   </script>
   <style>
     .typing {
@@ -157,10 +267,11 @@
       pointer-events: none;
       z-index: 9999;
       opacity: 1;
+      will-change: transform, opacity;
     }
   </style>
 <body>
-	<br>
+  <br>
   <table border="0">
     <tr>
       <td width="975" style="vertical-align: top; text-align: right; white-space: nowrap; overflow: hidden; max-width: 975px; padding-left: 0px; padding-right: 85px;">
