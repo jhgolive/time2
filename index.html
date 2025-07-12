@@ -1,268 +1,290 @@
 <script>
-    let typingLoopActive = true;
+  let typingLoopActive = true;
+  let animationFrameId = null; // 1. 애니메이션 프레임 ID 저장용
 
-    window.onload = function () {
-      time();
-      typing();
-    };
+  window.onload = function () {
+    time();
+    typing();
+  };
 
-    function typing() {
-      const $text = document.querySelector(".typing .text");
-      const letters = [
+  function typing() {
+    const $text = document.querySelector(".typing .text");
+    const letters = [
 				"쩡햄Live",
 				//"자율적후원",
-				//"자율적후원 1.테스트 ★ 큰 힘 감사합니다 ٩(ˊᗜˋ*)و",
+				//"자율적후원 1테스트  ★ 큰 힘 감사합니다 ٩(ˊᗜˋ*)و",
 				//"1테스트 2테스트 3테스트 ★ 큰 힘 감사합니다 ٩(ˊᗜˋ*)و",
 				//"6 7    8    9    10    11 ★ 큰 힘 감사합니다 ٩(ˊᗜˋ*)و",
 				"구독좋아요",
-				//"감사합니다",
+				"감사합니다",
 				"다시자유민주 다시윤석열 다시자유건국 YOONAGAIN"
-      ];
+    ];
 
-      const wordList = [
-	{ words: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ".", "★", "ᗜ"], color: "#FFC700" },
-	{ words: ["L", "후원", "구독", "감사", "다시", "YOON", "٩", "و"], color: "red" },
-	{ words: ["AGAIN"], color: "#6495ED" }
-      ];
+    const wordList = [
+      { words: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ".", "★", "ᗜ"], color: "#FFC700" },
+      { words: ["L", "후원", "구독", "감사", "다시", "YOON", "٩", "و"], color: "red" },
+      { words: ["AGAIN"], color: "#6495ED" }
+    ];
 
-      const speed = 100;
-      let i = 0;
+    const speed = 100;
+    let i = 0;
 
-      const wait = (ms) => new Promise((res) => {
-        if (window.requestIdleCallback) {
-          requestIdleCallback(() => setTimeout(res, ms));
-        } else {
-          setTimeout(res, ms);
-        }
-      });
-
-      const typingFunc = async () => {
-        if (!typingLoopActive) return;
-        $text.textContent = "";
-        const raw = letters[i];
-        const typingChars = [];
-        const consumed = Array(raw.length).fill(false);
-
-        for (const group of wordList) {
-          for (const word of group.words) {
-            let startIndex = 0;
-            while (startIndex < raw.length) {
-              const index = raw.indexOf(word, startIndex);
-              if (index === -1) break;
-              for (let j = 0; j < word.length; j++) {
-                typingChars[index + j] = { char: word[j], color: group.color };
-                consumed[index + j] = true;
-              }
-              startIndex = index + 1;
-            }
-          }
-        }
-
-        for (let j = 0; j < raw.length; j++) {
-          if (!consumed[j]) {
-            typingChars[j] = { char: raw[j], color: "white" };
-          }
-        }
-
-        const typingRect = $text.getBoundingClientRect();
-
-        for (const { char, color } of typingChars) {
-          if (!typingLoopActive) return;
-          await wait(speed);
-          const span = document.createElement("span");
-          span.textContent = char;
-          span.style.color = color;
-          $text.appendChild(span);
-
-          const rect = span.getBoundingClientRect();
-          const x = rect.left + rect.width / 2 + window.scrollX;
-          const y = rect.top + rect.height / 2 + window.scrollY + 10;
-          createBricksBatch(x, y, color, 10);
-        }
-
-        await wait(14000);
-        reverseTyping();
-      };
-
-      const reverseTyping = async () => {
-        const spans = Array.from($text.childNodes).reverse();
-        const typingRect = $text.getBoundingClientRect();
-
-        for (const span of spans) {
-          if (!typingLoopActive) return;
-          await wait(speed);
-          const rect = span.getBoundingClientRect();
-          const x = rect.left + rect.width / 2 + window.scrollX;
-          const y = rect.top + rect.height / 2 + window.scrollY + 10;
-          createBricksBatch(x, y, span.style.color, 10);
-          span.remove();
-        }
-
-        $text.textContent = "";
-        i = (i + 1) % letters.length;
-        typingFunc();
-      };
-
+    const wait = (ms) => new Promise((res) => {
       if (window.requestIdleCallback) {
-        requestIdleCallback(typingFunc);
+        requestIdleCallback(() => setTimeout(res, ms));
       } else {
-        setTimeout(typingFunc, 1000);
+        setTimeout(res, ms);
       }
-    }
-
-    (function () {
-      const brickPool = [];
-      const MAX_POOL = 80;
-      const activeBricks = [];
-      let isAnimating = false;
-
-      function getBrick() {
-        if (brickPool.length > 0) return brickPool.pop();
-        const div = document.createElement("div");
-        div.className = "brick";
-        return div;
-      }
-
-      function recycleBrick(brick) {
-        if (!brick) return;
-        brick.style.display = "none";
-        brick.style.opacity = 1;
-        brick.fading = false;
-        if (brick.__data__) {
-          brick.__data__.element = null;
-          brick.__data__ = null;
-        }
-        brickPool.push(brick);
-        while (brickPool.length > MAX_POOL) {
-          const removed = brickPool.pop();
-          removed.remove();
-        }
-      }
-
-      function animateBricks() {
-        const gravity = 0.5;
-        const friction = 0.6;
-
-        for (let i = activeBricks.length - 1; i >= 0; i--) {
-          const b = activeBricks[i];
-          if (!b.falling) continue;
-          b.dy += gravity;
-          b.posX += b.dx;
-          b.posY += b.dy;
-
-          if (b.posY >= b.ground) {
-            b.posY = b.ground;
-            b.dy = 0;
-            b.dx *= friction;
-            if (Math.abs(b.dx) < 0.1) b.dx = 0;
-            b.falling = false;
-
-            if (!b.waitingToRemove) {
-              b.waitingToRemove = true;
-              setTimeout(() => {
-                const idx = activeBricks.indexOf(b);
-                if (idx !== -1) activeBricks.splice(idx, 1);
-                recycleBrick(b.element);
-                b.element = null;
-              }, 200);
-            }
-          }
-
-          if (b.element) {
-            b.element.style.left = b.posX + "px";
-            b.element.style.top = b.posY + "px";
-          }
-        }
-
-        if (activeBricks.length > 0) {
-          requestAnimationFrame(animateBricks);
-        } else {
-          isAnimating = false;
-        }
-      }
-
-      window.createBricksBatch = function (x, y, color = "white", count = 10) {
-        const fragment = document.createDocumentFragment();
-        const bricksToAnimate = [];
-
-        for (let i = 0; i < count; i++) {
-          const brick = getBrick();
-          brick.style.left = x + "px";
-          brick.style.top = y + "px";
-          brick.style.background = color;
-          brick.style.border = "1px solid black";
-          brick.style.opacity = 1;
-          brick.style.display = "block";
-
-          fragment.appendChild(brick);
-
-          const dx = (Math.random() - 0.5) * 6;
-          const dy = (Math.random() - 1.5) * 6;
-
-          const brickData = {
-            element: brick,
-            posX: x,
-            posY: y,
-            dx: dx,
-            dy: dy,
-            ground: y,
-            falling: true,
-            waitingToRemove: false
-          };
-
-          brick.__data__ = brickData;
-          bricksToAnimate.push(brickData);
-        }
-
-        document.body.appendChild(fragment);
-        activeBricks.push(...bricksToAnimate);
-
-        if (!isAnimating) {
-          isAnimating = true;
-          requestAnimationFrame(animateBricks);
-        }
-      };
-    })();
-
-    function time() {
-      const today = new Date();
-      const hours = ("0" + today.getHours()).slice(-2);
-      const minutes = ("0" + today.getMinutes()).slice(-2);
-      document.getElementById("time").innerHTML = hours + ":" + minutes;
-    }
-
-    const timeInterval = setInterval(time, 60000);
-
-    window.addEventListener("beforeunload", function () {
-      clearInterval(timeInterval);
-      typingLoopActive = false;
-      window.createBricksBatch = () => {};
     });
-  </script>
-  <style>
-    .typing {
-      position: relative;
+
+    const typingFunc = async () => {
+      if (!typingLoopActive) return;
+      $text.textContent = "";
+      const raw = letters[i];
+      const typingChars = [];
+      const consumed = Array(raw.length).fill(false);
+
+      for (const group of wordList) {
+        for (const word of group.words) {
+          let startIndex = 0;
+          while (startIndex < raw.length) {
+            const index = raw.indexOf(word, startIndex);
+            if (index === -1) break;
+            for (let j = 0; j < word.length; j++) {
+              typingChars[index + j] = { char: word[j], color: group.color };
+              consumed[index + j] = true;
+            }
+            startIndex = index + 1;
+          }
+        }
+      }
+
+      for (let j = 0; j < raw.length; j++) {
+        if (!consumed[j]) {
+          typingChars[j] = { char: raw[j], color: "white" };
+        }
+      }
+
+      const typingRect = $text.getBoundingClientRect();
+
+      for (const { char, color } of typingChars) {
+        if (!typingLoopActive) return;
+        await wait(speed);
+        const span = document.createElement("span");
+        span.textContent = char;
+        span.style.color = color;
+        $text.appendChild(span);
+
+        const rect = span.getBoundingClientRect();
+        const x = rect.left + rect.width / 2 + window.scrollX;
+        const y = rect.top + rect.height / 2 + window.scrollY + 10;
+
+        //if (char !== " ") { // 공백일 때 파편 생략
+          createBricksBatch(x, y, color, 10);
+        //}
+      }
+
+      await wait(14000);
+      reverseTyping();
+    };
+
+    const reverseTyping = async () => {
+      const spans = Array.from($text.childNodes).reverse();
+      const typingRect = $text.getBoundingClientRect();
+
+      for (const span of spans) {
+        if (!typingLoopActive) return;
+        await wait(speed);
+        const rect = span.getBoundingClientRect();
+        const x = rect.left + rect.width / 2 + window.scrollX;
+        const y = rect.top + rect.height / 2 + window.scrollY + 10;
+
+        //if (span.textContent !== " ") { // 공백일 때 파편 생략
+          createBricksBatch(x, y, span.style.color, 10);
+        //}
+
+        span.remove();
+        span.textContent = null;  // 2. 메모리 누수 방지용 초기화
+        span.style = null;
+      }
+
+      $text.textContent = "";
+      i = (i + 1) % letters.length;
+      typingFunc();
+    };
+
+    if (window.requestIdleCallback) {
+      requestIdleCallback(typingFunc);
+    } else {
+      setTimeout(typingFunc, 1000);
     }
-    .brick {
-      position: absolute;
-      width: 12px;
-      height: 12px;
-      background: white;
-      border: 1px solid black;
-      border-radius: 3px;
-      pointer-events: none;
-      z-index: 9999;
-      opacity: 1;
-      will-change: transform, opacity;
+  }
+
+  (function () {
+    const brickPool = [];
+    const MAX_POOL = 80;
+    const activeBricks = [];
+    let isAnimating = false;
+
+    function getBrick() {
+      if (brickPool.length > 0) return brickPool.pop();
+      const div = document.createElement("div");
+      div.className = "brick";
+      return div;
     }
-  </style>
+
+    function recycleBrick(brick) {
+      if (!brick) return;
+
+      // 3. 스타일 초기화로 메모리 누수 방지
+      brick.style.cssText = "";
+      brick.removeAttribute("style");
+      brick.removeAttribute("class");
+      brick.className = "brick";
+
+      brick.style.display = "none";
+      brick.style.opacity = 1;
+      brick.fading = false;
+
+      if (brick.__data__) {
+        brick.__data__.element = null;
+        brick.__data__ = null;
+      }
+      brickPool.push(brick);
+
+      while (brickPool.length > MAX_POOL) {
+        const removed = brickPool.shift();
+        removed.remove();
+      }
+    }
+
+    function animateBricks() {
+      const gravity = 0.5;	// 파편 중력
+      const friction = 0.6;	// 파편 범위
+
+      for (let i = activeBricks.length - 1; i >= 0; i--) {
+        const b = activeBricks[i];
+        if (!b.falling) continue;
+        b.dy += gravity;
+        b.posX += b.dx;
+        b.posY += b.dy;
+
+        if (b.posY >= b.ground) {
+          b.posY = b.ground;
+          b.dy = 0;
+          b.dx *= friction;
+          if (Math.abs(b.dx) < 0.1) b.dx = 0;
+          b.falling = false;
+
+          if (!b.waitingToRemove) {
+            b.waitingToRemove = true;
+            setTimeout(() => {
+              const idx = activeBricks.indexOf(b);
+              if (idx !== -1) activeBricks.splice(idx, 1);
+              recycleBrick(b.element);
+              b.element = null;
+            }, 200);	// 파편 사라지는 시간
+          }
+        }
+
+        if (b.element) {
+          b.element.style.left = b.posX + "px";
+          b.element.style.top = b.posY + "px";
+        }
+      }
+
+      if (activeBricks.length > 0) {
+        animationFrameId = requestAnimationFrame(animateBricks); // 1. animationFrameId 저장
+      } else {
+        isAnimating = false;
+      }
+    }
+
+    window.createBricksBatch = function (x, y, color = "white", count = 10) {
+      const fragment = document.createDocumentFragment();
+      const bricksToAnimate = [];
+
+      for (let i = 0; i < count; i++) {
+        const brick = getBrick();
+        brick.style.left = x + "px";
+        brick.style.top = y + "px";
+        brick.style.background = color;
+        brick.style.border = "1px solid black";
+        brick.style.opacity = 1;
+        brick.style.display = "block";
+
+        fragment.appendChild(brick);
+
+        const dx = (Math.random() - 0.5) * 6;
+        const dy = (Math.random() - 1.5) * 6;
+
+        const brickData = {
+          element: brick,
+          posX: x,
+          posY: y,
+          dx: dx,
+          dy: dy,
+          ground: y,
+          falling: true,
+          waitingToRemove: false
+        };
+
+        brick.__data__ = brickData;
+        bricksToAnimate.push(brickData);
+      }
+
+      document.body.appendChild(fragment);
+      activeBricks.push(...bricksToAnimate);
+
+      if (!isAnimating) {
+        isAnimating = true;
+        animationFrameId = requestAnimationFrame(animateBricks); // 1. animationFrameId 저장
+      }
+    };
+  })();
+
+  function time() {
+    const today = new Date();
+    const hours = ("0" + today.getHours()).slice(-2);
+    const minutes = ("0" + today.getMinutes()).slice(-2);
+    document.getElementById("time").innerHTML = hours + ":" + minutes;
+  }
+
+  const timeInterval = setInterval(time, 60000);
+
+  window.addEventListener("beforeunload", function () {
+    clearInterval(timeInterval);
+    typingLoopActive = false;
+    window.createBricksBatch = () => {};
+    if (animationFrameId !== null) cancelAnimationFrame(animationFrameId); // 1. 프레임 루프 정리
+  });
+</script>
+
+<style>
+  .typing {
+    position: relative;
+  }
+  .brick {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: white;
+    border: 1px solid black;
+    border-radius: 3px;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 1;
+    will-change: transform, opacity;
+  }
+</style>
+
 <body>
-  <br>
+  <br />
   <table border="0">
     <tr>
       <td width="975" style="vertical-align: top; text-align: right; white-space: nowrap; overflow: hidden; max-width: 975px; padding-left: 0px; padding-right: 85px;">
         <span class="typing" style="color: white; font-size: 45px; font-weight: bold; font-family: hy울릉도b; text-shadow: -2px 0 black, 0 2px black, 2px 0 black, 0 -2px black;">
-          <span id="textcolor" class="text"></span>
+          <span id="textcolor" class="text" style="white-space: pre;"></span>
         </span>
         <span style="color: white; font-size: 45px; font-weight: bold; font-family: hy울릉도b; text-shadow: -2px 0 black, 0 2px black, 2px 0 black, 0 -2px black;visibility:hidden;">
           <font color="#FFC700">&ensp;&ensp;&ensp;카카오</font> 33330-7696-7896 <font color="#6495ED">오J한</font>
