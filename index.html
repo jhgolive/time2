@@ -10,10 +10,10 @@
   function typing() {
     const $text = document.querySelector(".typing .text");
     const letters = [
-				"2쩡햄Live",
-				"자율적후원",
-				"자율적후원  1테스트 ★ 큰 힘 감사합니다 ٩(ˊᗜˋ*)و",
-				"1테스트 2테스트 3테스트 ★ 큰 힘 감사합니다 ٩(ˊᗜˋ*)و",
+				"쩡햄Live",
+				//"자율적후원",
+				//"자율적후원  1테스트 ★ 큰 힘 감사합니다 ٩(ˊᗜˋ*)و",
+				//"1테스트 2테스트 3테스트 ★ 큰 힘 감사합니다 ٩(ˊᗜˋ*)و",
 				//"6 7    8    9    10    11 ★ 큰 힘 감사합니다 ٩(ˊᗜˋ*)و",
 				"구독좋아요",
 				"감사합니다",
@@ -76,8 +76,7 @@
         $text.appendChild(span);
 
         const rect = span.getBoundingClientRect();
-        const x = rect.right + window.scrollX; // 시작위치 오른쪽
-	      //const x = rect.right + rect.width / 2 + window.scrollX; // 시작위치 오른쪽
+        const x = rect.right + window.scrollX + 15; // 시작위치 오른쪽
         const y = rect.top + rect.height / 2 + window.scrollY + 10; // 시작위치 높이
 
         //if (char !== " ") { // 공백일 때 파편 생략
