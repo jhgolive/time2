@@ -271,7 +271,7 @@
         span.classList.add("time-change");
         const timeoutId = setTimeout(() => {
           span.classList.remove("time-change");
-        }, 1); // 1초 후 원래 스타일로 되돌림
+        }, 50); // 초 후 원래 스타일로 되돌림
         timeChangeTimeouts.push(timeoutId);
       }
 
