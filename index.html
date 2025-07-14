@@ -12,8 +12,8 @@
     const letters = [
 				"쩡햄Live",
 				//"자율적후원",
-				//"자율적후원ㅡ1ㅡㅡㅡ ★ 큰 힘 감사합니다 ٩(ˊᗜˋ*)و",
-				//"1ㅡㅡㅡ 2ㅡㅡㅡ 3ㅡㅡㅡ ★ 큰 힘 감사합니다 ٩(ˊᗜˋ*)و",
+				//"자율적후원ㅡㅡㅡㅡㅡ ★ 큰 힘 감사합니다 ٩(ˊᗜˋ*)و",
+				//"1ㅡㅡㅡ 2ㅡㅡㅡ 3ㅡㅡㅡ★ 큰 힘 감사합니다 ٩(ˊᗜˋ*)و",
 				//"6ㅡㅡㅡ 7ㅡㅡㅡ 8ㅡㅡㅡ 9ㅡㅡㅡ 10ㅡㅡㅡ 11ㅡㅡㅡ ★ 큰 힘 감사합니다 ٩(ˊᗜˋ*)و",
 				"구독좋아요",
 				"감사합니다",
@@ -21,8 +21,8 @@
     ];
 
     const wordList = [
-      { words: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ".", "★", "ᗜ"], color: "#FFC700" }, // 노랑
       { words: ["L", "후원", "구독", "감사", "다시", "YOON", "٩", "و"], color: "red" }, // 빨강
+      { words: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ".", "★", "ᗜ", "*"], color: "#FFC700" }, // 노랑
       { words: ["AGAIN"], color: "#6495ED" }, // 파랑
       { words: ["ㅡ"], color: "transparent" } // 투명
     ];
@@ -249,12 +249,34 @@
     };
   })();
 
-  function time() {
-    const today = new Date();
-    const hours = ("0" + today.getHours()).slice(-2);
-    const minutes = ("0" + today.getMinutes()).slice(-2);
-    document.getElementById("time").innerHTML = hours + ":" + minutes;
-  }
+	let prevTimeStr = "";
+	
+	function time() {
+	  const today = new Date();
+	  const hours = ("0" + today.getHours()).slice(-2);
+	  const minutes = ("0" + today.getMinutes()).slice(-2);
+	  const currentTimeStr = hours + ":" + minutes;
+	
+	  const timeEl = document.getElementById("time");
+	  timeEl.innerHTML = ""; // 초기화
+	
+	  for (let i = 0; i < currentTimeStr.length; i++) {
+	    const span = document.createElement("span");
+	    span.textContent = currentTimeStr[i];
+	
+	    if (prevTimeStr && currentTimeStr[i] !== prevTimeStr[i]) {
+	      span.classList.add("time-change");
+	      // 1초 후 원래 스타일로 되돌림
+	      setTimeout(() => {
+	        span.classList.remove("time-change");
+	      }, 0);
+	    }
+	
+	    timeEl.appendChild(span);
+	  }
+	
+	  prevTimeStr = currentTimeStr;
+	}
 
   const timeInterval = setInterval(time, 60000);
 
@@ -281,6 +303,14 @@
     z-index: 9999;
     opacity: 1;
     will-change: transform, opacity;
+  }
+  #time span {
+    color: white;
+    transition: color 5s ease; /* 부드럽게 색상 전환 */
+  }
+
+  .time-change {
+    color: #FFC700 !important; /* 노란색 */
   }
 </style>
 
