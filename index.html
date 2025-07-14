@@ -66,26 +66,24 @@
         }
       }
 
-      const typingRect = $text.getBoundingClientRect();
-
       for (const { char, color } of typingChars) {
         if (!typingLoopActive) return;
         await wait(speed);
         const span = document.createElement("span");
         span.textContent = char;
         span.style.color = color;
-	if (color === "transparent") {
-  		span.style.textShadow = "none"; // 테두리도 숨김
-	}
+        if (color === "transparent") {
+          span.style.textShadow = "none"; // 테두리도 숨김
+        }
         $text.appendChild(span);
 
         const rect = span.getBoundingClientRect();
         const x = rect.right + window.scrollX + 15; // 시작위치 오른쪽
         const y = rect.top + rect.height / 2 + window.scrollY + 10; // 시작위치 높이
 
-	const actualColor = (color === "transparent") ? "white" : color;
+        const actualColor = (color === "transparent") ? "white" : color;
         //if (char !== " ") { // 공백일 때 파편 생략
-          createBricksBatch(x, y, actualColor, 10);
+        	createBricksBatch(x, y, actualColor, 10);
         //}
       }
 
@@ -95,7 +93,6 @@
 
     const reverseTyping = async () => {
       const spans = Array.from($text.childNodes).reverse();
-      const typingRect = $text.getBoundingClientRect();
 
       for (const span of spans) {
         if (!typingLoopActive) return;
@@ -104,10 +101,10 @@
         const x = rect.left + rect.width / 2 + window.scrollX;
         const y = rect.top + rect.height / 2 + window.scrollY + 10;
 
-	const color = (span.style.color === "transparent") ? "white" : span.style.color;
+        const color = (span.style.color === "transparent") ? "white" : span.style.color;
         //if (span.textContent !== " ") { // 공백일 때 파편 생략
-          createBricksBatch(x, y, color, 10);
-        //}
+        	createBricksBatch(x, y, color, 10);
+        //}	
 
         span.remove();
         span.textContent = null;  // 2. 메모리 누수 방지용 초기화
@@ -147,7 +144,6 @@
       brick.removeAttribute("style");
       brick.removeAttribute("class");
       brick.className = "brick";
-
       brick.style.display = "none";
       brick.style.opacity = 1;
       brick.fading = false;
@@ -184,7 +180,8 @@
 
           if (!b.waitingToRemove) {
             b.waitingToRemove = true;
-            setTimeout(() => {
+            if (b.timeoutId) clearTimeout(b.timeoutId);
+            b.timeoutId = setTimeout(() => {
               const idx = activeBricks.indexOf(b);
               if (idx !== -1) activeBricks.splice(idx, 1);
               recycleBrick(b.element);
@@ -232,7 +229,8 @@
           dy: dy,
           ground: y,
           falling: true,
-          waitingToRemove: false
+          waitingToRemove: false,
+          timeoutId: null
         };
 
         brick.__data__ = brickData;
@@ -249,34 +247,39 @@
     };
   })();
 
-	let prevTimeStr = "";
-	
-	function time() {
-	  const today = new Date();
-	  const hours = ("0" + today.getHours()).slice(-2);
-	  const minutes = ("0" + today.getMinutes()).slice(-2);
-	  const currentTimeStr = hours + ":" + minutes;
-	
-	  const timeEl = document.getElementById("time");
-	  timeEl.innerHTML = ""; // 초기화
-	
-	  for (let i = 0; i < currentTimeStr.length; i++) {
-	    const span = document.createElement("span");
-	    span.textContent = currentTimeStr[i];
-	
-	    if (prevTimeStr && currentTimeStr[i] !== prevTimeStr[i]) {
-	      span.classList.add("time-change");
-	      // 1초 후 원래 스타일로 되돌림
-	      setTimeout(() => {
-	        span.classList.remove("time-change");
-	      }, 0);
-	    }
-	
-	    timeEl.appendChild(span);
-	  }
-	
-	  prevTimeStr = currentTimeStr;
-	}
+  let prevTimeStr = "";
+  let timeChangeTimeouts = [];
+
+  function time() {
+    const today = new Date();
+    const hours = ("0" + today.getHours()).slice(-2);
+    const minutes = ("0" + today.getMinutes()).slice(-2);
+    const currentTimeStr = hours + ":" + minutes;
+
+    const timeEl = document.getElementById("time");
+    timeEl.innerHTML = "";
+
+    // 이전 timeout 제거
+    timeChangeTimeouts.forEach(id => clearTimeout(id));
+    timeChangeTimeouts = [];
+
+    for (let i = 0; i < currentTimeStr.length; i++) {
+      const span = document.createElement("span");
+      span.textContent = currentTimeStr[i];
+
+      if (prevTimeStr && currentTimeStr[i] !== prevTimeStr[i]) {
+        span.classList.add("time-change");
+        const timeoutId = setTimeout(() => {
+          span.classList.remove("time-change");
+        }, 1); // 1초 후 원래 스타일로 되돌림
+        timeChangeTimeouts.push(timeoutId);
+      }
+
+      timeEl.appendChild(span);
+    }
+
+    prevTimeStr = currentTimeStr;
+  }
 
   const timeInterval = setInterval(time, 60000);
 
@@ -308,7 +311,6 @@
     color: white;
     transition: color 5s ease; /* 부드럽게 색상 전환 */
   }
-
   .time-change {
     color: #FFC700 !important; /* 노란색 */
   }
