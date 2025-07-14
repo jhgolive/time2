@@ -12,21 +12,22 @@
     const letters = [
 				"쩡햄Live",
 				//"자율적후원",
-				//"자율적후원  1테스트 ★ 큰 힘 감사합니다 ٩(ˊᗜˋ*)و",
-				//"1테스트 2테스트 3테스트 ★ 큰 힘 감사합니다 ٩(ˊᗜˋ*)و",
-				//"6 7    8    9    10    11 ★ 큰 힘 감사합니다 ٩(ˊᗜˋ*)و",
+				//"자율적후원ㅡ1ㅡㅡㅡ ★ 큰 힘 감사합니다 ٩(ˊᗜˋ*)و",
+				//"1ㅡㅡㅡ 2ㅡㅡㅡ 3ㅡㅡㅡ ★ 큰 힘 감사합니다 ٩(ˊᗜˋ*)و",
+				//"6ㅡㅡㅡ 7ㅡㅡㅡ 8ㅡㅡㅡ 9ㅡㅡㅡ 10ㅡㅡㅡ 11ㅡㅡㅡ ★ 큰 힘 감사합니다 ٩(ˊᗜˋ*)و",
 				"구독좋아요",
 				"감사합니다",
 				"다시자유민주 다시윤석열 다시자유건국 YOONAGAIN"
     ];
 
     const wordList = [
-      { words: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ".", "★", "ᗜ"], color: "#FFC700" },
-      { words: ["L", "후원", "구독", "감사", "다시", "YOON", "٩", "و"], color: "red" },
-      { words: ["AGAIN"], color: "#6495ED" }
+      { words: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ".", "★", "ᗜ"], color: "#FFC700" }, // 노랑
+      { words: ["L", "후원", "구독", "감사", "다시", "YOON", "٩", "و"], color: "red" }, // 빨강
+      { words: ["AGAIN"], color: "#6495ED" }, // 파랑
+      { words: ["ㅡ"], color: "transparent" } // 투명
     ];
 
-    const speed = 100;
+    const speed = 100; // 타이핑 속도
     let i = 0;
 
     const wait = (ms) => new Promise((res) => {
@@ -73,18 +74,22 @@
         const span = document.createElement("span");
         span.textContent = char;
         span.style.color = color;
+	if (color === "transparent") {
+  		span.style.textShadow = "none"; // 테두리도 숨김
+	}
         $text.appendChild(span);
 
         const rect = span.getBoundingClientRect();
         const x = rect.right + window.scrollX + 15; // 시작위치 오른쪽
         const y = rect.top + rect.height / 2 + window.scrollY + 10; // 시작위치 높이
 
+	const actualColor = (color === "transparent") ? "white" : color;
         //if (char !== " ") { // 공백일 때 파편 생략
-          createBricksBatch(x, y, color, 10);
+          createBricksBatch(x, y, actualColor, 10);
         //}
       }
 
-      await wait(14000);
+      await wait(14000); // 글자 멈춤 시간
       reverseTyping();
     };
 
@@ -99,8 +104,9 @@
         const x = rect.left + rect.width / 2 + window.scrollX;
         const y = rect.top + rect.height / 2 + window.scrollY + 10;
 
+	const color = (span.style.color === "transparent") ? "white" : span.style.color;
         //if (span.textContent !== " ") { // 공백일 때 파편 생략
-          createBricksBatch(x, y, span.style.color, 10);
+          createBricksBatch(x, y, color, 10);
         //}
 
         span.remove();
